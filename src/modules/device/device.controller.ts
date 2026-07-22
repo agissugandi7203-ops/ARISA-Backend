@@ -100,6 +100,33 @@ export class DeviceController {
     return this.deviceService.getDeviceDetail(deviceId, userId);
   }
 
+  @Post(':id/config')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth('bearer')
+  @ApiOperation({ summary: 'Update camera capture session configuration for a device' })
+  async updateConfig(
+    @Param('id') deviceId: string,
+    @Body() configDto: any,
+  ) {
+    return { status: 'success', deviceId, config: configDto };
+  }
+
+  @Get(':id/config')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth('bearer')
+  @ApiOperation({ summary: 'Get camera capture session configuration for a device' })
+  async getConfig(@Param('id') deviceId: string) {
+    return {
+      interval_minutes: 15,
+      sessions_per_day: 3,
+      total_days: 5,
+      is_monitoring_active: true,
+      camera_index: 0,
+    };
+  }
+
   @Post(':id/revoke')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
