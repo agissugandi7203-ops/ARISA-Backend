@@ -18,11 +18,12 @@ export class PrismaService
   private pool: Pool;
 
   constructor(private readonly configService: ConfigService) {
-    const databaseUrl = configService.get<string>('database.url');
+    const databaseUrl = configService.get<string>('database.url') || process.env.DATABASE_URL || 'postgresql://dummy:dummy@127.0.0.1:5432/dummy';
+    if (!configService.get<string>('database.url') && !process.env.DATABASE_URL) {
+      this.logger.warn('DATABASE_URL is missing from environment. Container is starting in degraded mode.');
+    }
 
-    // Prisma 7 uses pg Pool directly — configure timeouts explicitly
-    // (pg Pool defaults to 0 = no timeout, unlike Prisma 6's 5s default)
-    const isLocal = databaseUrl?.includes('localhost') || databaseUrl?.includes('127.0.0.1');
+    const isLocal = databaseUrl.includes('localhost') || databaseUrl.includes('127.0.0.1');
     const pool = new Pool({
       connectionString: databaseUrl,
       connectionTimeoutMillis: 5000,  // 5s — fail fast if DB unreachable
