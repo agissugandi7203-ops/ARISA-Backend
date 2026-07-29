@@ -502,8 +502,19 @@ export class AiGatewayService {
   // ─── Helpers ──────────────────────────────────────────────
 
   private resolveModel(alias?: string): string {
-    if (!alias) return this.defaultModel;
-    return MODEL_MAP[alias] || this.defaultModel;
+    if (!alias) {
+      return process.env.OPENROUTER_DEFAULT_MODEL || this.defaultModel || 'google/gemini-2.5-flash';
+    }
+    // Allow raw OpenRouter model IDs (e.g. "openai/gpt-4o-mini" or "meta-llama/llama-3.3-70b-instruct:nitro")
+    if (alias.includes('/')) {
+      return alias;
+    }
+    // Check environment variables first (e.g., OPENROUTER_MODEL_FLASH)
+    const envKey = `OPENROUTER_MODEL_${alias.toUpperCase().replace(/-/g, '_')}`;
+    if (process.env[envKey]) {
+      return process.env[envKey]!;
+    }
+    return MODEL_MAP[alias] || process.env.OPENROUTER_DEFAULT_MODEL || this.defaultModel || 'google/gemini-2.5-flash';
   }
 
   private async buildMessages(dto: ChatDto, userId?: string): Promise<OpenRouterMessage[]> {

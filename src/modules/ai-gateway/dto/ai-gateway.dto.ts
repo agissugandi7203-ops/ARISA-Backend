@@ -74,10 +74,10 @@ export class ChatDto {
   @MaxLength(32000)
   message: string;
 
-  @ApiPropertyOptional({ enum: ['gemini-flash', 'gemini-pro', 'claude-haiku'], default: 'gemini-flash' })
+  @ApiPropertyOptional({ description: 'Model alias (gemini-flash, gemini-pro, claude-haiku) or full OpenRouter model ID' })
   @IsOptional()
-  @IsIn(['gemini-flash', 'gemini-pro', 'claude-haiku'])
-  model?: 'gemini-flash' | 'gemini-pro' | 'claude-haiku';
+  @IsString()
+  model?: string;
 
   @ApiPropertyOptional({ description: 'Previous messages for multi-turn context' })
   @IsOptional()
